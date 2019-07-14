@@ -1,0 +1,236 @@
+scss教程。
+参考：https://www.jianshu.com/p/a99764ff3c41
+Sass是成熟、稳定、强大的CSS预处理器，
+而SCSS是Sass3版本当中引入的新语法特性，完全兼容CSS3的同时继承了Sass强大的动态功能.
+
+特性概念。
+css 书写大型应用 容易出现选择器 层叠 复杂度过高。
+sass 预处器会比较好的提供一些特性让css更加的有趣和方程式。
+
+变量。
+用来存储 css中重复利用的消息。通过$声明一个变量。
+例如颜色 字体。
+$font-stack: Helvetica, sans-serif;
+$primary-color: #333;
+
+body {
+    font: 100% $font-stack;
+    color: $primary-color;
+}
+
+上面的例子编译出来的是。
+body {
+    font: 100% Helvetica, sans-serif;
+    color: #333;
+}
+
+嵌套
+sass 可以让你嵌套使用，  但是 这个会让 网页 难维护。
+因此是好做法。
+
+nav {
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li { display: inline-block; }
+
+  a {
+    display: block;
+    padding: 6px 12px;
+    text-decoration: none;
+  }
+}
+
+编译后
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none; }
+nav li {
+  display: inline-block; }
+nav a {
+  display: block;
+  padding: 6px 12px;
+  text-decoration: none; }
+
+引入。
+sass 能够分多个片段。
+underscore风格的下划线作为其命名前缀（_partial.scss）。
+而且不让片段生成css内容 而是内置到了 @import的位置。
+
+// _reset.scss
+html, body, ul, ol {
+  margin:  0;
+  padding: 0;
+}
+
+// base.scss
+@import 'reset';
+body {
+  font: 100% Helvetica, sans-serif;
+  background-color: #efefef;
+}
+
+会引入 _reset.scss文件的scss。
+
+
+混合
+混合（Mixin）用来分组那些需要在页面中复用的CSS声明
+SASS目前使用@mixin name指令来进行混合操作。
+
+@mixin border-radius($radius) { //关键字创建分组。
+          border-radius: $radius;
+      -ms-border-radius: $radius;
+     -moz-border-radius: $radius;
+  -webkit-border-radius: $radius;
+}
+
+.box {
+  @include border-radius(10px); //@include 引用 那个 mixin。
+}
+
+编译出来的是。
+.box {
+  border-radius: 10px;
+  -ms-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px; }
+
+继承。
+通过@extend指令在选择器之间复用CSS属性，并且不会产生冗余的代码
+
+// 这段代码不会被输出到最终生成的CSS文件，因为它没有被任何代码所继承。
+%other-styles {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+// 下面代码会正常输出到生成的CSS文件，因为它被其接下来的代码所继承。
+%message-common {
+  border: 1px solid #ccc;
+  padding: 10px;
+  color: #333;
+}
+
+.message {
+  @extend %message-common;
+}
+
+.success {
+  @extend %message-common;
+  border-color: green;
+}
+
+.error {
+  @extend %message-common;
+  border-color: red;
+}
+
+.warning {
+  @extend %message-common;
+  border-color: yellow;
+}
+
+编译：
+.message, .success, .error, .warning {
+  border: 1px solid #ccc;
+  padding: 10px;
+  color: #333; }
+
+.success {
+  border-color: green; }
+
+.error {
+  border-color: red; }
+
+.warning {
+  border-color: yellow; }
+
+操作符
+sass提供了标准的算术运算
+
+.container { width: 100%; }
+
+article[role="main"] {
+  float: left;
+  width: 600px / 960px * 100%;
+}
+
+aside[role="complementary"] {
+  float: right;
+  width: 300px / 960px * 100%;
+}
+编译：
+.container {
+  width: 100%; }
+
+article[role="main"] {
+  float: left;
+  width: 62.5%; }
+
+aside[role="complementary"] {
+  float: right;
+  width: 31.25%; }
+
+css 扩展
+引用父级选择器"&"
+Scss使用"&"关键字在CSS规则中引用父级选择器，例如在嵌套使用伪类选择器的场景下：
+/*===== SCSS =====*/
+a {
+  font-weight: bold;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+  body.firefox & { font-weight: normal; }
+}
+
+/*===== CSS =====*/
+a {
+  font-weight: bold;
+  text-decoration: none; }
+  a:hover {
+    text-decoration: underline; }
+  body.firefox a {
+    font-weight: normal; }
+
+编译
+无论CSS规则嵌套的深度怎样，关键字"&"都会使用父级选择器级联替换全部其出现的位置：
+/*===== SCSS =====*/
+#main {
+  color: black;
+  a {
+    font-weight: bold;
+    &:hover { color: red; }
+  }
+}
+
+/*===== CSS =====*/
+#main {
+  color: black; }
+  #main a {
+    font-weight: bold; }
+    #main a:hover {
+      color: red; }
+
+
+嵌套属性
+Scss当中只需要编写命名空间一次，后续嵌套的子属性都将会位于该命名空间之下
+
+/*===== SCSS =====*/
+.demo {
+  // 命令空间后带有冒号:
+  font: {
+    family: fantasy;
+    size: 30em;
+    weight: bold;
+  }
+}
+
+
+/*===== CSS =====*/
+.demo {
+  font-family: fantasy;
+  font-size: 30em;
+  font-weight: bold; }
